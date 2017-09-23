@@ -37,6 +37,8 @@ function Game(lastGameId, lastHash, bankroll, gameHistory) {
     self.lastHash = lastHash;
     self.hash = null;
 
+    self.maxBet = 1e8;
+
     events.EventEmitter.call(self);
 
     function runGame() {
@@ -65,9 +67,12 @@ function Game(lastGameId, lastHash, bankroll, gameHistory) {
             self.gameDuration = Math.ceil(inverseGrowth(self.crashPoint + 1)); // how long till the game will crash..
             self.maxWin = Math.round(self.bankroll * 0.03); // Risk 3% per game
 
+            self.maxBet = Math.round(self.maxWin * 0.01);
+
             self.emit('game_starting', {
                 game_id: self.gameId,
                 max_win: self.maxWin,
+                max_bet: self.maxBet,
                 time_till_start: restartTime
             });
 
@@ -256,6 +261,7 @@ Game.prototype.getInfo = function() {
         game_id: this.gameId, // game_id of current game, if game hasnt' started its the last game
         last_hash: this.lastHash,
         max_win: this.maxWin,
+        max_bet: this.maxBet,
         // if the game is pending, elapsed is how long till it starts
         // if the game is running, elapsed is how long its running for
         /// if the game is ended, elapsed is how long since the game started
